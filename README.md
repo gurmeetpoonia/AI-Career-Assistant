@@ -29,33 +29,25 @@ An AI-powered Resume Analyzer that evaluates resumes against job descriptions us
 
 ## 🖥️ Demo
 
-> *(Add your Streamlit Cloud link here after deployment)*
-
 ```
-https://your-app.streamlit.app
+https://ai-resume-analyzer-rcb.streamlit.app/
 ```
 
+---
 ---
 
 ## 📸 Screenshots
 
 ### Dashboard
 
-> Add screenshot here
+![Dashboard](assets/dashboard.png)
 
-```
-assets/dashboard.png
-```
+### AI Resume Analyzer
 
-### ATS Analysis
+![AI Resume Analyzer](assets/ats_score.png)
 
-> Add screenshot here
+![AI Resume Analyzer](assets/ai_sta.png)
 
-```
-assets/analysis.png
-```
-
----
 
 ## 🛠️ Tech Stack
 

@@ -68,7 +68,7 @@ with input_col2:
 
 # Gradient Primary Action Button
 st.markdown('<div class="btn-container">', unsafe_allow_html=True)
-analyze = st.button("🚀 Analyze Application Profile", use_container_width=True)
+analyze = st.button("🚀 Analyze Application Profile", width="stretch")
 st.markdown('</div>', unsafe_allow_html=True)
 
 
@@ -161,7 +161,7 @@ if st.session_state.analysis_done:
             transition={'duration': 800, 'easing': 'cubic-in-out'} # Added smooth layout graph easing transition
         )
 
-        st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
+        st.plotly_chart(fig, width="stretch", config={'displayModeBar': False})
         
         match_status = "Excellent Match" if ats_score >= 90 else "Good Match" if ats_score >= 75 else "Average Match" if ats_score >= 60 else "Low Compatibility"
         status_color = "#10b981" if ats_score >= 90 else "#47B550" if ats_score >= 75 else "#cdef44" if ats_score>=60 else "#ef4444"
@@ -304,7 +304,7 @@ Final Verdict:
             data=pdf_file,
             file_name="AI_Resume_Report.pdf",
             mime="application/pdf",
-            use_container_width=True,
+            width="stretch",
         )
         else:
             st.error("❌ PDF report could not be generated.")
