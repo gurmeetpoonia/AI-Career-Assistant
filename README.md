@@ -108,7 +108,7 @@ AI_Resume_Analyzer/
 Clone the repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/AI-Resume-Analyzer.git
+git clone https://github.com/gurmeetpoonia/AI-Resume-Analyzer.git
 ```
 
 Go to project
@@ -169,10 +169,10 @@ streamlit run streamlit_app.py
 **Gurmeet Punia**
 
 LinkedIn:
-(Add your LinkedIn)
+https://www.linkedin.com/in/gurmeet-punia-7846a5318
 
 GitHub:
-https://github.com/YOUR_USERNAME
+https://github.com/gurmeetpoonia
 
 ---
 
