@@ -1,18 +1,10 @@
 from google import genai
 from google.genai import types
+from gemini_client import generate_with_rotation
 import time
 from google.genai.errors import APIError 
-from dotenv import load_dotenv
 import os
 import json 
-
-load_dotenv()
-
-# Client Initialization
-client = genai.Client(
-    api_key=os.getenv("API_KEY")
-)
-
 
 
 def analyze_resume(resume_text, job_description):
@@ -52,70 +44,70 @@ Job Description:
 Return JSON only.
 """
 
-    max_retries = 3
-    retry_delay = 2  # Start with a 2-second delay
-
-    for attempt in range(max_retries):
-        try:
-            response = client.models.generate_content(
-                model="gemini-2.5-flash",
-                contents=prompt,
-                config=types.GenerateContentConfig(
-                    temperature=0.7,
-                    top_p=0.95,    
-                    response_mime_type="application/json",
-                    system_instruction=(
-                        "Extract technical skills, ignore soft skills, ensure unique entries, proper capitalization, "
-                        "keep strengths/weaknesses/suggestions concise, and return an integer ats_score between 0 and 100."
-                    ),
-                    response_schema={
-                        "type": "OBJECT",
-                        "properties": {
-                            "ats_score": {"type": "INTEGER"},
-                            "resume_skills": {"type": "ARRAY", "items": {"type": "STRING"}},
-                            "job_skills": {"type": "ARRAY", "items": {"type": "STRING"}},
-                            "matched_skills": {"type": "ARRAY", "items": {"type": "STRING"}},
-                            "missing_skills": {"type": "ARRAY", "items": {"type": "STRING"}},
-                            "strengths": {"type": "ARRAY", "items": {"type": "STRING"}},
-                            "weaknesses": {"type": "ARRAY", "items": {"type": "STRING"}},
-                            "suggestions": {"type": "ARRAY", "items": {"type": "STRING"}},
-                            
-                        },
-                        "required": [
-                            "ats_score", "resume_skills", "job_skills", "matched_skills", 
-                            "missing_skills", "strengths", "weaknesses", "suggestions"
-                        ]
-                    }
-                )
+    try:
+        response = generate_with_rotation(
+            model="gemini-2.5-flash",
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                temperature=0.7,
+                top_p=0.95,    
+                response_mime_type="application/json",
+                system_instruction=(
+                    "Extract technical skills, ignore soft skills, ensure unique entries, proper capitalization, "
+                    "keep strengths/weaknesses/suggestions concise, and return an integer ats_score between 0 and 100."
+                ),
+                response_schema={
+                    "type": "OBJECT",
+                    "properties": {
+                        "ats_score": {"type": "INTEGER"},
+                        "resume_skills": {"type": "ARRAY", "items": {"type": "STRING"}},
+                        "job_skills": {"type": "ARRAY", "items": {"type": "STRING"}},
+                        "matched_skills": {"type": "ARRAY", "items": {"type": "STRING"}},
+                        "missing_skills": {"type": "ARRAY", "items": {"type": "STRING"}},
+                        "strengths": {"type": "ARRAY", "items": {"type": "STRING"}},
+                        "weaknesses": {"type": "ARRAY", "items": {"type": "STRING"}},
+                        "suggestions": {"type": "ARRAY", "items": {"type": "STRING"}},
+                        
+                    },
+                    "required": [
+                        "ats_score", "resume_skills", "job_skills", "matched_skills", 
+                        "missing_skills", "strengths", "weaknesses", "suggestions"
+                    ]
+                }
             )
+        )
 
-            # If successful, parse and return data
-            data = json.loads(response.text.strip())
-            data.setdefault("status", "success")
-            return data
+        # If successful, parse and return data
+        data = json.loads(response.text.strip())
+        data.setdefault("status", "success")
+        return data
 
-        except Exception as e:
-            error = str(e)
-            # If it's a quota error and we have retries left, wait and try again
-            if ("429" in error or "RESOURCE_EXHAUSTED" in error) and attempt < max_retries - 1:
-                time.sleep(retry_delay)
-                retry_delay *= 2  # Double the wait time for the next attempt (Exponential Backoff)
-                continue
-            
-            # If all retries fail or it's a quota error on the final attempt
-            if "429" in error or "RESOURCE_EXHAUSTED" in error:
-                return {"status": "quota_exceeded", "message": "Quota exceeded after retries."}
-            
-            # General system error handling
+    except Exception as e:
+        error=str(e)
+        # If it's a quota error and we have retries left, wait and try again
+        if "RESOURCE_EXHAUSTED" in error or "429" in error:
             return {
-    "status":"error",
-    "ats_score":0,
-    "resume_skills":[],
-    "job_skills":[],
-    "matched_skills":[],
-    "missing_skills":[],
-    "strengths":[],
-    "weaknesses":[],
-    "suggestions":[]
+                "status": "error",
+                "message": "🚫 Gemini API quota exceeded. Please wait about 1 minute and try again."
+            }
+        
+        # If all retries fail or it's a quota error on the final attempt
+        elif "503" in error or "UNAVAILABLE" in error:
+            return {
+                "status": "error",
+                "message": "⚠️ Gemini servers are busy. Please try again later."
+            }
+
+        # JSON Error
+        elif "JSON" in error:
+            return {
+                "status": "error",
+                "message": "⚠️ AI returned an invalid response. Please retry."
+            }
+
+        # Any other error
+        return {
+            "status": "error",
+            "message": f"System Error: {error}"
+        }
     
-}
