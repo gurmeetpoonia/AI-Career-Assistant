@@ -204,22 +204,19 @@ def show_analysis_result():
                 st.markdown('<p class="section-header">📊 Generated Report Preview</p>', unsafe_allow_html=True)
                 
                 if os.path.exists("resume_report.pdf"):
-                    # 1. Pehle PDF ko base64 me convert kiya
-                   
+                    import base64
                     with open("resume_report.pdf", "rb") as f:
                         base64_pdf = base64.b64encode(f.read()).decode('utf-8')
                     
-                    # 2. UPPER: Pehle live preview embed hoke show hoga
+                    # FIX: iframe ko hata kar <embed> tag lagaya hai
                     pdf_display = f'''
                         <div class="pdf-preview-container">
-                            <iframe src="data:application/pdf;base64,{base64_pdf}#toolbar=0&navpanes=0&scrollbar=1" width="100%" height="300px" style="border:none; border-radius:6px;"></iframe>
+                            <embed src="data:application/pdf;base64,{base64_pdf}" width="100%" height="300px" type="application/pdf">
                         </div>
                     '''
                     st.markdown(pdf_display, unsafe_allow_html=True)
-                    
                     st.write("") 
                     
-                    # 3. NEECHE: Preview ke just neeche full-width download button
                     with open("resume_report.pdf", "rb") as pdf_file:
                         st.download_button(
                             label="📥 Download Executive Report PDF",
@@ -232,4 +229,6 @@ def show_analysis_result():
                     st.error("❌ PDF report could not be generated for preview.")
                     
                 st.markdown('</div>', unsafe_allow_html=True)
+                    
+               
             
