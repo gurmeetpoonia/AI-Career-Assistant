@@ -569,6 +569,6 @@ div[data-testid="stMetric"] {
     color: var(--text-main);
     border-radius: 8px;
     padding: 15px;
-    height: 300px;
+    height: 385px;
     overflow-y: auto;
 }
